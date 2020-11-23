@@ -1,3 +1,4 @@
+#include "atmega328_flasher.h"
 #include <Arduino.h>
 #include <string.h>
 #include <SPI.h>
@@ -25,7 +26,7 @@ static uint8_t desired_fuses [3] = {
   0b11110101, // EFUSE, F5
 };
 
-SPISettings spi_settings = SPISettings(300000, SPI_MSBFIRST, SPI_MODE0);
+static SPISettings spi_settings = SPISettings(300000, SPI_MSBFIRST, SPI_MODE0);
 
 void do_spi_transaction(void) {
   SPI.beginTransaction(spi_settings);
@@ -180,7 +181,7 @@ int8_t flash_file(String filename, int8_t reset_pin)
   else {
     #ifdef VERBOSE
       Serial.println("Signature check passed - its an ATmega328PB!");
-    #endif VERBOSE
+    #endif
   }
 
   // Read the fuses so we can verify they have not changed
@@ -307,9 +308,12 @@ int8_t flash_file(String filename, int8_t reset_pin)
 
   // Let the ATmega328 exit reset state
   digitalWrite(reset_pin, HIGH);
+  delay(20);
 
   #ifdef VERBOSE
     Serial.println("Success uploading ATmega328 firmware!");
   #endif
   SPI.end();
+
+  return 0;
 }
